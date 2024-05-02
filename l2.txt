@@ -1,0 +1,41 @@
+// Mono-alphabetic Cipher
+
+#include <iostream>
+#include <map>
+#include <cstdlib>
+#include <ctime>
+using namespace std;
+
+map<char, char> generateKey() {
+    string alphabet = "abcdefghijklmnopqrstuvwxyz";
+    string shuffledAlphabet = alphabet;
+    srand(time(0));
+    random_shuffle(shuffledAlphabet.begin(), shuffledAlphabet.end());
+    map<char, char> key;
+    for (int i = 0; i < alphabet.size(); ++i) {
+        key[alphabet[i]] = shuffledAlphabet[i];
+    }
+    return key;
+}
+
+string encryptDecrypt(string text, map<char, char> key) {
+    string result;
+    for (char ch : text) {
+        char base = isupper(ch) ? 'A' : 'a';
+        char encryptedChar = isalpha(ch) ? key[tolower(ch)] : ch;
+        result += isupper(ch) ? toupper(encryptedChar) : encryptedChar;
+    }
+    return result;
+}
+
+int main() {
+    map<char, char> key = generateKey();
+    cout << "Enter plaintext: ";
+    string plaintext;
+    getline(cin, plaintext);
+    string encryptedText = encryptDecrypt(plaintext, key);
+    cout << "Encrypted Text: " << encryptedText << endl;
+    string decryptedText = encryptDecrypt(encryptedText, key);
+    cout << "Decrypted Text: " << decryptedText << endl;
+    return 0;
+}

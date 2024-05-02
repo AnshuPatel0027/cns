@@ -1,0 +1,39 @@
+// Rail-Fence
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+string railFenceEncrypt(const string& text, int key) {
+    string result;
+    vector<string> rail(key, "");
+
+    int row = 0;
+    bool dir_down = false;
+
+    for (char c : text) {
+        rail[row] += c;
+        if (row == 0 || row == key - 1)
+            dir_down = !dir_down;
+        row += dir_down ? 1 : -1;
+    }
+
+    for (const string& str : rail)
+        result += str;
+
+    return result;
+}
+
+int main() {
+    string plaintext;
+    int key;
+
+    cout << "Enter the plaintext: ";
+    getline(cin, plaintext);
+    cout << "Enter the number of rails (key): ";
+    cin >> key;
+
+    cout << "Encrypted Text: " << railFenceEncrypt(plaintext, key) << endl;
+
+    return 0;
+}

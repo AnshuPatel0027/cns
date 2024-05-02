@@ -1,0 +1,37 @@
+// Vigenère Cipher
+
+#include <iostream>
+#include <cctype>
+using namespace std;
+
+string vigenereCipherEncrypt(const string& plaintext, const string& keyword) {
+    string encryptedText = "";
+    int keywordLength = keyword.length();
+    int j = 0;
+    for (size_t i = 0; i < plaintext.length(); ++i) {
+        char currentChar = plaintext[i];
+        if (isalpha(currentChar)) {
+            currentChar = toupper(currentChar);
+            char keyChar = keyword[j % keywordLength];
+            keyChar = toupper(keyChar);
+            int shift = keyChar - 'A';
+            char encryptedChar = 'A' + (currentChar - 'A' + shift) % 26;
+            encryptedText += encryptedChar;
+            ++j;
+        } else {
+            encryptedText += currentChar;
+        }
+    }
+    return encryptedText;
+}
+
+int main() {
+    string plaintext, keyword;
+    cout << "Enter the plaintext message: ";
+    getline(cin, plaintext);
+    cout << "Enter the keyword: ";
+    cin >> keyword;
+    string encryptedMessage = vigenereCipherEncrypt(plaintext, keyword);
+    cout << "Encrypted Message: " << encryptedMessage << endl;
+    return 0;
+}

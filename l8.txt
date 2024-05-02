@@ -1,0 +1,99 @@
+// RSA asymmetric (public key and private key)- Encryption
+
+#include <iostream>
+#include <vector>
+#include <cmath>
+#include <cstdlib>
+#include <ctime>
+using namespace std;
+
+bool is_prime(int num) {
+    if (num < 2) return false;
+    for (int i = 2; i <= sqrt(num); ++i) {
+        if (num % i == 0) return false;
+    }
+    return true;
+}
+
+int gcd(int a, int b) {
+    while (b != 0) {
+        int temp = b;
+        b = a % b;
+        a = temp;
+    }
+    return a;
+}
+
+int mod_pow(int base, int exponent, int mod) {
+    int result = 1;
+    base = base % mod;
+    while (exponent > 0) {
+        if (exponent % 2 == 1) {
+            result = (result * base) % mod;
+        }
+        exponent = exponent >> 1;
+        base = (base * base) % mod;
+    }
+    return result;
+}
+
+pair<int, int> generate_keypair(int bits) {
+    srand(time(nullptr));
+    int p = 0, q = 0;
+    while (!is_prime(p)) {
+        p = rand() % (1 << (bits / 2));
+    }
+    while (!is_prime(q) || q == p) {
+        q = rand() % (1 << (bits / 2));
+    }
+    int n = p * q;
+    int phi = (p - 1) * (q - 1);
+    int e = rand() % (phi - 2) + 2;
+    while (gcd(e, phi) != 1) {
+        e = rand() % (phi - 2) + 2;
+    }
+    int d = 0;
+    while ((d * e) % phi != 1) {
+        ++d;
+    }
+    return make_pair(n, e), make_pair(n, d);
+}
+
+vector<int> encrypt(const string& message, const pair<int, int>& public_key) {
+    vector<int> encrypted_message;
+    int n = public_key.first;
+    int e = public_key.second;
+    for (char c : message) {
+        encrypted_message.push_back(mod_pow(c, e, n));
+    }
+    return encrypted_message;
+}
+
+string decrypt(const vector<int>& encrypted_message, const pair<int, int>& private_key) {
+    string decrypted_message;
+    int n = private_key.first;
+    int d = private_key.second;
+    for (int num : encrypted_message) {
+        decrypted_message.push_back(mod_pow(num, d, n));
+    }
+    return decrypted_message;
+}
+
+int main() {
+    int bits = 10;
+    auto [public_key_n, public_key_e] = generate_keypair(bits);
+    auto [private_key_n, private_key_d] = generate_keypair(bits);
+    pair<int, int> public_key = make_pair(public_key_n, public_key_e);
+    pair<int, int> private_key = make_pair(private_key_n, private_key_d);
+    string message = "Hello, RSA encryption!";
+    cout << "Original Message: " << message << endl;
+    vector<int> encrypted_message = encrypt(message, public_key);
+    cout << "Encrypted Message: ";
+    for (int num : encrypted_message) {
+        cout << num << " ";
+    }
+    cout << endl;
+    string decrypted_message = decrypt(encrypted_message, private_key);
+    cout << "Decrypted Message: " << decrypted_message << endl;
+    return 0;
+}

@@ -1,0 +1,35 @@
+// Caesar Cipher
+
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+string encryptDecrypt(string text, int shift) {
+    for (int i = 0; i < text.length(); i++) {
+        if (isalpha(text[i])) {
+            char base = isupper(text[i]) ? 'A' : 'a';
+            text[i] = (text[i] - base + shift) % 26 + base;
+        }
+    }
+    return text;
+}
+
+int main() {
+    string text;
+    int shift;
+
+    cout << "Enter a string: ";
+    getline(cin, text);
+
+    cout << "Enter the Caesar Cipher shift value: ";
+    cin >> shift;
+
+    string encrypted = encryptDecrypt(text, shift);
+    string decrypted = encryptDecrypt(encrypted, -shift);
+
+    cout << "Encrypted text: " << encrypted << endl;
+    cout << "Decrypted text: " << decrypted << endl;
+
+    return 0;
+}

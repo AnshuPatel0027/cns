@@ -1,0 +1,94 @@
+// Play-Fair Cipher
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+const int SIZE = 5;
+
+class PlayfairCipher {
+private:
+    char keySquare[SIZE][SIZE];
+
+    void generateKeySquare(const string& key) {
+        string keyString = prepareKey(key);
+        int k = 0;
+        for (int i = 0; i < SIZE; ++i) {
+            for (int j = 0; j < SIZE; ++j) {
+                keySquare[i][j] = keyString[k++];
+            }
+        }
+    }
+
+    string prepareKey(const string& key) {
+        string preparedKey;
+        bool taken[26] = {false};
+        for (char ch : key) {
+            ch = toupper(ch);
+            if (ch != 'J' && !taken[ch - 'A']) {
+                preparedKey += ch;
+                taken[ch - 'A'] = true;
+            }
+        }
+        for (char ch = 'A'; ch <= 'Z'; ++ch) {
+            if (ch != 'J' && !taken[ch - 'A']) {
+                preparedKey += ch;
+            }
+        }
+        return preparedKey;
+    }
+
+public:
+    PlayfairCipher(const string& key) {
+        generateKeySquare(key);
+    }
+
+    string encryptPair(char a, char b) {
+        int rowA, colA, rowB, colB;
+        for (int i = 0; i < SIZE; ++i) {
+            for (int j = 0; j < SIZE; ++j) {
+                if (keySquare[i][j] == a) {
+                    rowA = i;
+                    colA = j;
+                }
+                if (keySquare[i][j] == b) {
+                    rowB = i;
+                    colB = j;
+                }
+            }
+        }
+        if (rowA == rowB) {
+            return string(1, keySquare[rowA][(colA + 1) % SIZE]) +
+                   keySquare[rowB][(colB + 1) % SIZE];
+        } else if (colA == colB) {
+            return string(1, keySquare[(rowA + 1) % SIZE][colA]) +
+                   keySquare[(rowB + 1) % SIZE][colB];
+        } else {
+            return string(1, keySquare[rowA][colB]) + keySquare[rowB][colA];
+        }
+    }
+
+    string encrypt(const string& plaintext) {
+        string encryptedText;
+        for (size_t i = 0; i < plaintext.length(); i += 2) {
+            char a = toupper(plaintext[i]);
+            char b = (i + 1 < plaintext.length()) ? toupper(plaintext[i + 1]) : 'Z';
+            if (a == b) {
+                b = 'Z';
+                i--;
+            }
+            encryptedText += encryptPair(a, b);
+        }
+        return encryptedText;
+    }
+};
+
+int main() {
+    string key = "MYKEY";
+    PlayfairCipher playfair(key);
+    string plaintext = "INDUSUNI";
+    cout << "Original Text: " << plaintext << endl;
+    string ciphertext = playfair.encrypt(plaintext);
+    cout << "Encrypted Text: " << ciphertext << endl;
+    return 0;
+}

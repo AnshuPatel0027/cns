@@ -1,0 +1,58 @@
+// Hill Cipher
+
+#include <iostream>
+#include <vector>
+#include <cctype>
+using namespace std;
+
+// Function to perform matrix multiplication
+vector<int> multiplyMatrix(const vector<vector<int>>& keyMatrix, const vector<int>& vector) {
+    vector<int> result(2, 0);
+    for (int i = 0; i < 2; ++i) {
+        for (int j = 0; j < 2; ++j) {
+            result[i] += keyMatrix[i][j] * vector[j];
+        }
+        result[i] %= 26; // Perform modular 26 operation
+    }
+    return result;
+}
+
+int main() {
+    // Step 1: Input Data
+    string plaintext;
+    cout << "Enter Plaintext message: ";
+    getline(cin, plaintext);
+    int key;
+    cout << "Enter 4 digit key: ";
+    cin >> key;
+
+    // Step 2: Preprocess Plaintext
+    // Convert to uppercase
+    for (char& ch : plaintext) {
+        ch = toupper(ch);
+    }
+    // Pad with 'X' if length is odd
+    if (plaintext.length() % 2 != 0) {
+        plaintext += 'X';
+    }
+
+    // Step 3: Prepare the Key Matrix
+    vector<vector<int>> keyMatrix(2, vector<int>(2, 0));
+    keyMatrix[0][0] = key / 1000;
+    keyMatrix[0][1] = (key % 1000) / 100;
+    keyMatrix[1][0] = (key % 100) / 10;
+    keyMatrix[1][1] = key % 10;
+
+    // Step 4: Encryption Process
+    string encryptedText;
+    for (size_t i = 0; i < plaintext.length(); i += 2) {
+        vector<int> vector = {plaintext[i] - 'A', plaintext[i + 1] - 'A'};
+        vector<int> result = multiplyMatrix(keyMatrix, vector);
+        encryptedText += char(result[0] + 'A') + char(result[1] + 'A');
+    }
+
+    // Step 5: Output the Encrypted Text
+    cout << "Encrypted mssg: " << encryptedText << endl;
+
+    return 0;
+}
